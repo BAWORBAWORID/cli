@@ -4,67 +4,58 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pterodactyl — Console</title>
+  <!-- xterm v4 — reliable CDN with UMD builds -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.3.0/xterm.min.css" />
 </head>
 <body>
 
-<!-- Sidebar -->
-<aside class="sidebar">
+<!-- ── Sidebar ─────────────────────────────────────────────── -->
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <svg class="logo-icon" viewBox="0 0 32 32" fill="none">
-      <path d="M16 2L30 9V23L16 30L2 23V9L16 2Z" stroke="#007BFF" stroke-width="2" fill="none"/>
+      <path d="M16 2L30 9V23L16 30L2 23V9L16 2Z" stroke="#007BFF" stroke-width="2"/>
       <path d="M16 8L24 12V20L16 24L8 20V12L16 8Z" fill="#007BFF" opacity="0.3"/>
       <circle cx="16" cy="16" r="3" fill="#007BFF"/>
     </svg>
     <span class="logo-text">Pterodactyl</span>
   </div>
-
   <nav class="sidebar-nav">
     <div class="nav-section-label">SERVER</div>
     <a href="#" class="nav-item active" data-tab="console">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8l3 3-3 3"/><path d="M13 14h4"/></svg>
-      Console
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8l3 3-3 3"/><path d="M13 14h4"/></svg>Console
     </a>
     <a href="#" class="nav-item" data-tab="files">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      File Manager
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>File Manager
     </a>
     <a href="#" class="nav-item" data-tab="databases">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>
-      Databases
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>Databases
     </a>
     <a href="#" class="nav-item" data-tab="schedules">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-      Schedules
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Schedules
     </a>
     <a href="#" class="nav-item" data-tab="users">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Users
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Users
     </a>
     <a href="#" class="nav-item" data-tab="backups">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 9 20 20 4 20 4 9"/><rect x="2" y="4" width="20" height="5"/><line x1="12" y1="14" x2="12" y2="17"/></svg>
-      Backups
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 9 20 20 4 20 4 9"/><rect x="2" y="4" width="20" height="5"/><line x1="12" y1="14" x2="12" y2="17"/></svg>Backups
     </a>
     <a href="#" class="nav-item" data-tab="network">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      Network
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Network
     </a>
     <a href="#" class="nav-item" data-tab="startup">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Startup
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>Startup
     </a>
     <a href="#" class="nav-item" data-tab="settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
-      Settings
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M2 12h2M20 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>Settings
     </a>
   </nav>
 </aside>
 
-<!-- Main content -->
+<!-- ── Main ───────────────────────────────────────────────── -->
 <main class="main">
 
-  <!-- Top bar -->
+  <!-- Topbar -->
   <header class="topbar">
     <div class="topbar-left">
       <button class="sidebar-toggle" id="sidebarToggle">
@@ -79,26 +70,26 @@
       </div>
     </div>
     <div class="topbar-right">
-      <div class="server-status" id="serverStatus">
-        <span class="status-dot online" id="statusDot"></span>
+      <div class="server-status">
+        <span class="status-dot" id="statusDot"></span>
         <span id="statusText">Connecting...</span>
       </div>
-      <button class="btn btn-start" id="btnStart">Start</button>
-      <button class="btn btn-stop" id="btnStop">Stop</button>
+      <button class="btn btn-start"   id="btnStart">Start</button>
+      <button class="btn btn-stop"    id="btnStop">Stop</button>
       <button class="btn btn-restart" id="btnRestart">Restart</button>
     </div>
   </header>
 
-  <!-- Tab: Console -->
+  <!-- ── Tab: Console ──────────────────────────────────────── -->
   <section class="tab-content active" id="tab-console">
     <div class="console-wrapper">
       <div class="console-header">
         <div class="console-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8l3 3-3 3"/><path d="M13 14h4"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8l3 3-3 3"/><path d="M13 14h4"/></svg>
           Live Console
         </div>
         <div class="console-actions">
-          <button class="console-btn" id="btnClear" title="Clear">
+          <button class="console-btn" id="btnClear" title="Clear terminal">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
           <button class="console-btn" id="btnFullscreen" title="Fullscreen">
@@ -109,12 +100,10 @@
       <div id="terminal" class="terminal-container"></div>
       <div class="console-input-row">
         <span class="input-prompt">$</span>
-        <input type="text" id="cmdInput" class="console-input" placeholder="Type a command..." autocomplete="off" spellcheck="false" />
+        <input type="text" id="cmdInput" class="console-input" placeholder="Type a command and press Enter..." autocomplete="off" spellcheck="false" />
         <button class="btn btn-send" id="btnSend">Send</button>
       </div>
     </div>
-
-    <!-- Stats row -->
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">CPU Usage</div>
@@ -138,38 +127,82 @@
     </div>
   </section>
 
-  <!-- Placeholder tabs -->
+  <!-- ── Tab: File Manager ─────────────────────────────────── -->
   <section class="tab-content" id="tab-files">
-    <div class="placeholder-tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-      <h2>File Manager</h2>
-      <p>Manage your server files here.</p>
+    <div class="fm-wrapper">
+      <!-- Toolbar -->
+      <div class="fm-toolbar">
+        <div class="fm-toolbar-left">
+          <button class="btn-fm" id="fmBack" title="Go up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </button>
+          <div class="fm-breadcrumb" id="fmBreadcrumb"></div>
+        </div>
+        <div class="fm-toolbar-right">
+          <button class="btn-fm btn-fm-primary" id="fmNewFile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            New File
+          </button>
+          <button class="btn-fm btn-fm-primary" id="fmNewFolder">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+            New Folder
+          </button>
+          <button class="btn-fm" id="fmRefresh">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+
+      <!-- File list -->
+      <div class="fm-list-header">
+        <span class="fm-col-name">Name</span>
+        <span class="fm-col-size">Size</span>
+        <span class="fm-col-date">Modified</span>
+        <span class="fm-col-actions">Actions</span>
+      </div>
+      <div class="fm-list" id="fmList">
+        <div class="fm-loading">Loading...</div>
+      </div>
     </div>
   </section>
-  <section class="tab-content" id="tab-databases">
-    <div class="placeholder-tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg>
-      <h2>Databases</h2>
-      <p>No databases configured.</p>
-    </div>
-  </section>
-  <section class="tab-content" id="tab-schedules">
-    <div class="placeholder-tab">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-      <h2>Schedules</h2>
-      <p>No schedules configured.</p>
-    </div>
-  </section>
+
+  <!-- Placeholder tabs -->
+  <section class="tab-content" id="tab-databases"><div class="placeholder-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg><h2>Databases</h2><p>No databases configured.</p></div></section>
+  <section class="tab-content" id="tab-schedules"><div class="placeholder-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><h2>Schedules</h2><p>No schedules configured.</p></div></section>
   <section class="tab-content" id="tab-users"><div class="placeholder-tab"><h2>Users</h2><p>Manage sub-users here.</p></div></section>
   <section class="tab-content" id="tab-backups"><div class="placeholder-tab"><h2>Backups</h2><p>No backups yet.</p></div></section>
   <section class="tab-content" id="tab-network"><div class="placeholder-tab"><h2>Network</h2><p>Manage allocations here.</p></div></section>
-  <section class="tab-content" id="tab-startup"><div class="placeholder-tab"><h2>Startup</h2><p>Configure startup parameters here.</p></div></section>
+  <section class="tab-content" id="tab-startup"><div class="placeholder-tab"><h2>Startup</h2><p>Configure startup parameters.</p></div></section>
   <section class="tab-content" id="tab-settings"><div class="placeholder-tab"><h2>Settings</h2><p>Server settings here.</p></div></section>
 
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.3.0/xterm.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/5.3.0/addon-fit.min.js"></script>
+<!-- ── Modal ──────────────────────────────────────────────── -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Edit File</span>
+      <button class="modal-close" id="modalClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody">
+      <!-- injected by JS -->
+    </div>
+    <div class="modal-footer" id="modalFooter">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ──────────────────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<!-- xterm v4 (UMD) + addon-fit -->
+<script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.5.0/lib/xterm-addon-fit.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
