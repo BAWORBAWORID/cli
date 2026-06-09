@@ -3,6 +3,7 @@ const http    = require('http');
 const WebSocket = require('ws');
 const pty     = require('node-pty');
 const path    = require('path');
+const os      = require('os');
 const fsp     = require('fs').promises;
 const fs      = require('fs');
 const { v4: uuidv4 } = require('uuid');
@@ -157,6 +158,69 @@ app.post('/api/files/rename', async (req, res) => {
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
   }
+});
+
+/* ── System Info API ──────────────────────────────────────── */
+function getDiskInfo(dir) {
+  try {
+    // Fall back to '/' if the target dir doesn't exist
+    const target = fs.existsSync(dir) ? dir : '/';
+    const s = fs.statfsSync(target);
+    const total = s.blocks * s.bsize;
+    const free  = s.bfree  * s.bsize;
+    const used  = total - free;
+    return { total, used, free, pct: total ? Math.round((used / total) * 100) : 0 };
+  } catch { return null; }
+}
+
+function getCpuModel() {
+  try {
+    const cpus = os.cpus();
+    if (!cpus.length) return 'N/A';
+    // Deduplicate model names
+    const models = [...new Set(cpus.map(c => c.model.trim()))];
+    return models[0] + ' (' + cpus.length + ' cores)';
+  } catch { return 'N/A'; }
+}
+
+app.get('/api/system/info', (_req, res) => {
+  const totalMem = os.totalmem();
+  const freeMem  = os.freemem();
+  const usedMem  = totalMem - freeMem;
+
+  const diskRoot  = getDiskInfo(FILES_ROOT);
+  const diskTotal = getDiskInfo('/');
+
+  const cpus = os.cpus();
+  const load = os.loadavg();
+
+  const info = {
+    hostname: os.hostname(),
+    platform: os.platform(),
+    release:  os.release(),
+    arch:     os.arch(),
+    uptime:   os.uptime(),
+    cpu: {
+      model:   getCpuModel(),
+      cores:   cpus.length,
+      load1:   load[0],
+      load5:   load[1],
+      load15:  load[2]
+    },
+    memory: {
+      total: totalMem,
+      used:  usedMem,
+      free:  freeMem,
+      pct:   totalMem ? Math.round((usedMem / totalMem) * 100) : 0
+    },
+    disk: {
+      root: diskRoot,
+      total: diskTotal
+    },
+    user: os.userInfo().username
+  };
+
+  res.json({ ok: true, ...info });
 });
 
 /* ── WebSocket Terminal ───────────────────────────────────── */

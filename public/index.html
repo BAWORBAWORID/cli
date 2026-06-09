@@ -190,7 +190,76 @@
   <section class="tab-content" id="tab-backups"><div class="placeholder-tab"><h2>Backups</h2><p>No backups yet.</p></div></section>
   <section class="tab-content" id="tab-network"><div class="placeholder-tab"><h2>Network</h2><p>Manage allocations here.</p></div></section>
   <section class="tab-content" id="tab-startup"><div class="placeholder-tab"><h2>Startup</h2><p>Configure startup parameters.</p></div></section>
-  <section class="tab-content" id="tab-settings"><div class="placeholder-tab"><h2>Settings</h2><p>Server settings here.</p></div></section>
+  <section class="tab-content" id="tab-settings">
+    <div class="sysinfo-wrapper">
+      <div class="sysinfo-loading" id="sysinfoLoading">Loading system information...</div>
+      <div class="sysinfo-grid" id="sysinfoGrid" style="display:none">
+
+        <!-- Server Overview -->
+        <div class="sys-card sys-card-full">
+          <div class="sys-card-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Server Overview
+          </div>
+          <div class="sys-card-body">
+            <div class="sys-prop" id="sysHostname"><span class="sys-label">Hostname</span><span class="sys-value">—</span></div>
+            <div class="sys-prop" id="sysPlatform"><span class="sys-label">OS</span><span class="sys-value">—</span></div>
+            <div class="sys-prop" id="sysUptime"><span class="sys-label">Uptime</span><span class="sys-value">—</span></div>
+            <div class="sys-prop" id="sysUser"><span class="sys-label">User</span><span class="sys-value">—</span></div>
+          </div>
+        </div>
+
+        <!-- CPU -->
+        <div class="sys-card">
+          <div class="sys-card-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M20 9h3M1 15h3M20 15h3"/></svg>
+            CPU
+          </div>
+          <div class="sys-card-body">
+            <div class="sys-prop" id="sysCpuModel"><span class="sys-label">Model</span><span class="sys-value">—</span></div>
+            <div class="sys-prop" id="sysCpuLoad"><span class="sys-label">Load (1/5/15m)</span><span class="sys-value">—</span></div>
+          </div>
+        </div>
+
+        <!-- Memory -->
+        <div class="sys-card">
+          <div class="sys-card-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="9" x2="6" y2="15"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/><line x1="18" y1="9" x2="18" y2="15"/></svg>
+            Memory
+          </div>
+          <div class="sys-card-body">
+            <div class="sys-prop" id="sysMemTotal"><span class="sys-label">Total</span><span class="sys-value">—</span></div>
+            <div class="sys-prop" id="sysMemUsed"><span class="sys-label">Used</span><span class="sys-value">—</span></div>
+            <div class="sys-prop" id="sysMemFree"><span class="sys-label">Free</span><span class="sys-value">—</span></div>
+            <div class="sys-progress-row">
+              <span class="sys-label">Usage</span>
+              <div class="sys-progress-bar"><div class="sys-progress-fill mem-fill" id="sysMemBar"></div></div>
+              <span class="sys-progress-pct" id="sysMemPct">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disk -->
+        <div class="sys-card">
+          <div class="sys-card-header">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="12" rx="10" ry="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v2M22 12h-2M12 20v2M2 12h2"/></svg>
+            Disk
+          </div>
+          <div class="sys-card-body">
+            <div class="sys-prop" id="sysDiskTotal"><span class="sys-label">Total</span><span class="sys-value">—</span></div>
+            <div class="sys-prop" id="sysDiskUsed"><span class="sys-label">Used</span><span class="sys-value">—</span></div>
+            <div class="sys-prop" id="sysDiskFree"><span class="sys-label">Free</span><span class="sys-value">—</span></div>
+            <div class="sys-progress-row">
+              <span class="sys-label">Usage</span>
+              <div class="sys-progress-bar"><div class="sys-progress-fill disk-fill" id="sysDiskBar"></div></div>
+              <span class="sys-progress-pct" id="sysDiskPct">0%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
 </main>
 

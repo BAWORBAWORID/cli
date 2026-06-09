@@ -17,6 +17,7 @@ navItems.forEach(item => {
     currentTabLabel.textContent = item.textContent.trim();
     if (tab === 'console') { setTimeout(() => { fitAddon?.fit(); term?.focus(); }, 50); }
     if (tab === 'files')   { fm.load(fm.cwd); }
+    if (tab === 'settings') { loadSystemInfo(); }
   });
 });
 
@@ -577,6 +578,77 @@ function uploadFiles(files) {
     xhr.open('POST', '/api/files/upload');
     xhr.send(formData);
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SYSTEM INFO (tab Settings)
+═══════════════════════════════════════════════════════════ */
+
+async function loadSystemInfo() {
+  const grid  = document.getElementById('sysinfoGrid');
+  const loading = document.getElementById('sysinfoLoading');
+  loading.style.display = 'block';
+  grid.style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/system/info');
+    const data = await res.json();
+    if (!data.ok) throw new Error('Failed');
+
+    // Overview
+    document.getElementById('sysHostname').querySelector('.sys-value').textContent = data.hostname;
+    document.getElementById('sysPlatform').querySelector('.sys-value').textContent =
+      data.platform.charAt(0).toUpperCase() + data.platform.slice(1) + ' ' + data.release + ' (' + data.arch + ')';
+    document.getElementById('sysUptime').querySelector('.sys-value').textContent = formatUptime(data.uptime);
+    document.getElementById('sysUser').querySelector('.sys-value').textContent   = data.user;
+
+    // CPU
+    document.getElementById('sysCpuModel').querySelector('.sys-value').textContent = data.cpu.model;
+    document.getElementById('sysCpuLoad').querySelector('.sys-value').textContent =
+      data.cpu.load1.toFixed(2) + ' / ' + data.cpu.load5.toFixed(2) + ' / ' + data.cpu.load15.toFixed(2);
+
+    // Memory
+    document.getElementById('sysMemTotal').querySelector('.sys-value').textContent = formatSysBytes(data.memory.total);
+    document.getElementById('sysMemUsed').querySelector('.sys-value').textContent  = formatSysBytes(data.memory.used);
+    document.getElementById('sysMemFree').querySelector('.sys-value').textContent  = formatSysBytes(data.memory.free);
+    document.getElementById('sysMemBar').style.width = data.memory.pct + '%';
+    document.getElementById('sysMemPct').textContent = data.memory.pct + '%';
+
+    // Disk (root filesystem)
+    const disk = data.disk.root;
+    if (disk) {
+      document.getElementById('sysDiskTotal').querySelector('.sys-value').textContent = formatSysBytes(disk.total);
+      document.getElementById('sysDiskUsed').querySelector('.sys-value').textContent  = formatSysBytes(disk.used);
+      document.getElementById('sysDiskFree').querySelector('.sys-value').textContent  = formatSysBytes(disk.free);
+      document.getElementById('sysDiskBar').style.width = disk.pct + '%';
+      document.getElementById('sysDiskPct').textContent  = disk.pct + '%';
+    }
+
+    loading.style.display = 'none';
+    grid.style.display = 'grid';
+  } catch (err) {
+    loading.textContent = 'Failed to load system info: ' + err.message;
+  }
+}
+
+function formatUptime(seconds) {
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  let parts = [];
+  if (d) parts.push(d + 'd');
+  if (h) parts.push(h + 'h');
+  parts.push(m + 'm');
+  return parts.join(' ');
+}
+
+function formatSysBytes(v) {
+  if (v === 0) return '0 B';
+  const units = ['B','KB','MB','GB','TB'];
+  let i = 0;
+  let val = v;
+  while (val >= 1024 && i < units.length - 1) { val /= 1024; i++; }
+  return val.toFixed(val >= 10 ? 0 : 1) + ' ' + units[i];
 }
 
 /* ── Helper: escape HTML for injection into innerHTML ─────── */
