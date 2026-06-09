@@ -259,6 +259,13 @@ const fm = {
         : `<button class="fm-action" title="View"     onclick="fm.viewFile('${item.path}','${item.name}')">
              ${this.iconView()}
            </button>
+           ${item.name.toLowerCase().endsWith('.zip') ? 
+             `<button class="fm-action" title="Extract" onclick="fm.extractFile('${item.path}')">
+               ${this.iconExtract()}
+             </button>` : ''}
+           <button class="fm-action" title="Download" onclick="fm.downloadFile('${item.path}')">
+             ${this.iconDownload()}
+           </button>
            <button class="fm-action" title="Edit"     onclick="fm.editFile('${item.path}','${item.name}')">
              ${this.iconEdit()}
            </button>
@@ -449,6 +456,17 @@ const fm = {
     this.load(parts.join('/'));
   },
 
+  /* ── Download file ───────────────────────────────────────── */
+  downloadFile(filePath) {
+    const a = document.createElement('a');
+    a.href = '/api/files/download?path=' + encodeURIComponent(filePath);
+    a.download = filePath.split('/').pop() || 'download';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast('Downloading...', 'ok');
+  },
+
   /* ── Helpers ────────────────────────────────────────────── */
   formatSize(bytes) {
     if (bytes === 0) return '0 B';
@@ -469,6 +487,22 @@ const fm = {
   iconEdit()   { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`; },
   iconRename() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>`; },
   iconDelete() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`; },
+  iconDownload() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`; },
+  iconExtract() { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>`; },
+
+  /* ── Extract zip ─────────────────────────────────────────── */
+  async extractFile(filePath) {
+    try {
+      const res  = await fetch('/api/files/extract', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: filePath })
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error);
+      toast('Extracted to folder: ' + data.extractedTo, 'ok');
+      this.load(this.cwd);
+    } catch (err) { toast('Extract failed: ' + err.message, 'err'); }
+  },
 };
 
 /* ── File Manager toolbar buttons ────────────────────────── */

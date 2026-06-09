@@ -8,6 +8,7 @@ const fsp     = require('fs').promises;
 const fs      = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const multer  = require('multer');
+const AdmZip = require('adm-zip');
 
 const app    = express();
 const server = http.createServer(app);
@@ -70,6 +71,27 @@ app.get('/api/files/read', async (req, res) => {
     if (stat.size > 5 * 1024 * 1024) return res.status(400).json({ ok: false, error: 'File too large (>5MB)' });
     const content = await fsp.readFile(abs, 'utf8');
     res.json({ ok: true, content });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+// GET /api/files/download?path=  → stream file as download
+app.get('/api/files/download', async (req, res) => {
+  try {
+    const abs = safePath(req.query.path || '');
+    const stat = await fsp.stat(abs);
+    if (stat.isDirectory())
+      return res.status(400).json({ ok: false, error: 'Cannot download a directory' });
+
+    const name = path.basename(abs);
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(name)}"`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Length', stat.size);
+
+    const stream = fs.createReadStream(abs);
+    stream.pipe(res);
+    stream.on('error', () => { res.status(500).end(); });
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
   }
@@ -143,6 +165,32 @@ app.post('/api/files/mkdir', async (req, res) => {
     const abs = safePath(req.body.path || '');
     await fsp.mkdir(abs, { recursive: true });
     res.json({ ok: true });
+  } catch (err) {
+    res.status(400).json({ ok: false, error: err.message });
+  }
+});
+
+// POST /api/files/extract  { path }  — extract a .zip archive
+app.post('/api/files/extract', async (req, res) => {
+  try {
+    const abs  = safePath(req.body.path || '');
+    const stat = await fsp.stat(abs);
+    if (stat.isDirectory())
+      return res.status(400).json({ ok: false, error: 'Cannot extract a directory' });
+
+    const ext = path.extname(abs).toLowerCase();
+    if (ext !== '.zip')
+      return res.status(400).json({ ok: false, error: 'Only .zip files can be extracted' });
+
+    const destDir = abs.replace(/\.zip$/i, '');
+
+    // Create destination directory named after the zip
+    await fsp.mkdir(destDir, { recursive: true });
+
+    const zip = new AdmZip(abs);
+    zip.extractAllTo(destDir, true);
+
+    res.json({ ok: true, extractedTo: path.basename(destDir) });
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
   }
