@@ -252,6 +252,36 @@ body {
 .fm-empty { padding: 40px; text-align: center; color: var(--text3); font-size: 14px; }
 .fm-loading { padding: 40px; text-align: center; color: var(--text3); font-size: 14px; }
 
+/* ── Drop Zone ───────────────────────────────────────────── */
+.fm-dropzone {
+  position: absolute; inset: 0; z-index: 50;
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  background: rgba(0,123,255,.12); border: 2px dashed var(--accent);
+  border-radius: var(--radius); gap: 12px;
+  pointer-events: none;
+}
+.fm-dropzone.active { display: flex; }
+.fm-dropzone svg { width: 48px; height: 48px; color: var(--accent); }
+.fm-dropzone span { font-size: 15px; font-weight: 600; color: var(--accent); }
+
+/* ── Upload Progress ─────────────────────────────────────── */
+.fm-upload-progress {
+  display: none; align-items: center; gap: 10px;
+  padding: 8px 16px; background: var(--surface);
+  border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.fm-upload-progress.active { display: flex; }
+.fm-upload-progress-bar {
+  flex: 1; height: 6px; background: var(--bg);
+  border-radius: 3px; overflow: hidden; position: relative;
+}
+.fm-upload-progress-bar::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: var(--prog, 0%); background: var(--accent);
+  border-radius: 3px; transition: width .2s ease;
+}
+.fm-upload-progress-text { font-size: 12px; color: var(--text2); white-space: nowrap; }
+
 /* ── Modal ───────────────────────────────────────────────── */
 .modal-backdrop {
   display: none; position: fixed; inset: 0;

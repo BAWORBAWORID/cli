@@ -6,14 +6,15 @@ const path    = require('path');
 const fsp     = require('fs').promises;
 const fs      = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const multer  = require('multer');
 
 const app    = express();
 const server = http.createServer(app);
 const wss    = new WebSocket.Server({ server });
 const PORT   = process.env.PORT || 3000;
 
-// Files root — default /app, can override via FILES_ROOT env
-const FILES_ROOT = (process.env.FILES_ROOT || '/app').replace(/\/$/, '');
+// Files root — default /app/files, can override via FILES_ROOT env
+const FILES_ROOT = (process.env.FILES_ROOT || '/app/files').replace(/\/$/, '');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '20mb' }));
@@ -99,6 +100,40 @@ app.delete('/api/files', async (req, res) => {
   } catch (err) {
     res.status(400).json({ ok: false, error: err.message });
   }
+});
+
+/* ── File upload via multer ──────────────────────────────── */
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, _file, cb) => {
+      const relPath = req.body.path || '';
+      const absPath = safePath(relPath);
+      cb(null, absPath);
+    },
+    filename: (_req, file, cb) => {
+      // Prevent path traversal in filename
+      const name = path.basename(file.originalname);
+      cb(null, name);
+    }
+  }),
+  limits: { fileSize: 200 * 1024 * 1024 } // 200 MB max
+});
+
+// POST /api/files/upload  (multipart: field 'file' + field 'path')
+app.post('/api/files/upload', (req, res) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE')
+          return res.status(400).json({ ok: false, error: 'File too large (max 200 MB)' });
+        return res.status(400).json({ ok: false, error: err.message });
+      }
+      return res.status(400).json({ ok: false, error: err.message });
+    }
+    if (!req.file)
+      return res.status(400).json({ ok: false, error: 'No file provided' });
+    res.json({ ok: true, name: req.file.filename, size: req.file.size });
+  });
 });
 
 // POST /api/files/mkdir  { path }

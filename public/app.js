@@ -476,6 +476,109 @@ document.getElementById('fmNewFolder').addEventListener('click',  () => fm.newFo
 document.getElementById('fmRefresh').addEventListener('click',    () => fm.load(fm.cwd));
 document.getElementById('fmBack').addEventListener('click',       () => fm.goUp());
 
+/* ── Upload ────────────────────────────────────────────────── */
+const fmFileInput  = document.getElementById('fmFileInput');
+const fmUploadBtn  = document.getElementById('fmUploadBtn');
+const fmDropzone   = document.getElementById('fmDropzone');
+const fmProgWrap   = document.getElementById('fmUploadProgress');
+const fmProgBar    = document.getElementById('fmUploadProgressBar');
+const fmProgText   = document.getElementById('fmUploadProgressText');
+
+fmUploadBtn.addEventListener('click', () => fmFileInput.click());
+fmFileInput.addEventListener('change', () => {
+  if (fmFileInput.files.length) {
+    uploadFiles(fmFileInput.files);
+    fmFileInput.value = '';
+  }
+});
+
+/* ── Drag & Drop ──────────────────────────────────────────── */
+const fmWrapper = document.querySelector('.fm-wrapper');
+let dragCounter = 0;
+
+fmWrapper.addEventListener('dragenter', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  dragCounter++;
+  fmDropzone.classList.add('active');
+});
+
+fmWrapper.addEventListener('dragover', (e) => {
+  e.preventDefault(); e.stopPropagation();
+});
+
+fmWrapper.addEventListener('dragleave', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  dragCounter--;
+  if (dragCounter <= 0) { dragCounter = 0; fmDropzone.classList.remove('active'); }
+});
+
+fmWrapper.addEventListener('drop', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  dragCounter = 0;
+  fmDropzone.classList.remove('active');
+  const files = e.dataTransfer?.files;
+  if (files?.length) uploadFiles(files);
+});
+
+/* ── Upload logic with progress ────────────────────────────── */
+function uploadFiles(files) {
+  const total = files.length;
+  let done = 0;
+
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append('path', fm.cwd);
+    formData.append('file', file);
+
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.addEventListener('progress', (e) => {
+      if (!e.lengthComputable) return;
+      const pct = Math.round((e.loaded / e.total) * 100);
+      fmProgWrap.classList.add('active');
+      fmProgBar.style.setProperty('--prog', pct + '%');
+      fmProgText.textContent = `Uploading ${file.name} (${pct}%)`;
+    });
+
+    xhr.addEventListener('load', () => {
+      done++;
+      try {
+        const data = JSON.parse(xhr.responseText);
+        if (data.ok) {
+          toast(`Uploaded: ${data.name}`, 'ok');
+        } else {
+          toast(`Upload failed: ${data.error}`, 'err');
+        }
+      } catch {
+        toast('Upload failed: parse error', 'err');
+      }
+
+      if (done >= total) {
+        // All done — hide progress
+        setTimeout(() => {
+          fmProgWrap.classList.remove('active');
+          fmProgBar.style.width = '0%';
+        }, 1000);
+        fm.load(fm.cwd);
+      }
+    });
+
+    xhr.addEventListener('error', () => {
+      done++;
+      toast(`Upload failed: ${file.name}`, 'err');
+      if (done >= total) {
+        setTimeout(() => {
+          fmProgWrap.classList.remove('active');
+          fmProgBar.style.width = '0%';
+        }, 1000);
+      }
+    });
+
+    xhr.open('POST', '/api/files/upload');
+    xhr.send(formData);
+  }
+}
+
 /* ── Helper: escape HTML for injection into innerHTML ─────── */
 function escHtml(str) {
   return String(str)
