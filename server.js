@@ -288,7 +288,7 @@ wss.on('connection', (ws) => {
           name: 'xterm-256color',
           cols: msg.cols || 120,
           rows: msg.rows || 30,
-          cwd:  '/',
+          cwd:  FILES_ROOT,
           env:  { ...process.env, TERM: 'xterm-256color', COLORTERM: 'truecolor' }
         });
         terminals.set(sessionId, pty_);
